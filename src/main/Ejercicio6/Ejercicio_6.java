@@ -27,19 +27,20 @@ public class Ejercicio_6 {
                 wifiPassword = scannerInstance.nextLine();
             }else{
                 System.out.println("Contraseña correcta, conectado a tu red WIFI.");
-
+                //creacion de ciclo while para validar el numero de serie los 3 intentos
                 while(numberAttempts2 < 4){
-
+                    //solicitar numero de serie y se almacena en value
                     System.out.println("Ingrese el numero de la serie :\n" +
                             "| 2 | 9 | 16 | 23 | 30 | 37 | 44 |");
                     int value = scannerInstance.nextInt();
-
+                    //condicional si el numero es diferente a 51 muestra el mensaje de error
                     if (value != 51){
                         System.out.println("Numero de la serie incorrecto, numero de intento = " +  numberAttempts2);
 
                     }else{
+                        //muestra el mensaje de bienvenido al sistema
                         System.out.println("Bienvenido al sistema");
-                        numberAttempts2=3;
+                        //termina el programa
                         break;
                     }
                     numberAttempts2 += 1;
