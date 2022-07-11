@@ -4,7 +4,9 @@
  */
 package reto1.Modelo;
 
-import com.sun.jdi.connect.spi.Connection;
+import java.sql.Connection;
+import java.sql.DriverManager;
+
 
 
 
@@ -18,15 +20,15 @@ public class Conexion {
     String URL = "jdbc:mysql://localhost:3306/reto1_g54_db";
     String usuario = "root";
     String password = "199230CMFg1.";
-    
+    Connection con = null;
     public Conexion getConexion(){
-        Connection con = null;
+        
         try{
-             Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
             con = (Connection) DriverManager.getConnection(URL, usuario, password);
         }catch(Exception e){
             System.out.println("Error: " + e.getMessage());
         }
-        return con;
+        return (Conexion) con;
     }
 }
