@@ -4,8 +4,8 @@
  */
 package reto1;
 
-import reto1.vistas.login;
-
+import Reto1.vistas.login;
+import Reto1.Modelo.Conexion;
 /**
  *
  * @author jonat
@@ -18,6 +18,8 @@ public class Reto1 {
     public static void main(String[] args) {
         login lg = new login();
         lg.setVisible(true);
+        Conexion Con = new Conexion();
+        
     }
     
 }

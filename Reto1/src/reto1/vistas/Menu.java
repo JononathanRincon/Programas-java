@@ -2,20 +2,50 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package reto1.vistas;
+package Reto1.vistas;
+import Reto1.Modelo.Conexion;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.table.DefaultTableModel;
+import Reto1.Controlador.*;
+import javax.swing.ComboBoxModel;
 
 /**
  *
  * @author jonat
  */
 public class Menu extends javax.swing.JFrame {
-
+    Conexion con = new Conexion();
+    Connection cn;
+    Statement st;
+    ResultSet rs;
+    DefaultTableModel contenidoTablaEmpleados;
+    DefaultTableModel contenidoTablaDepartamento;
+    ComboBoxModel enumDepartamentos, enumZonas, enumTipoCalles;
     /**
      * Creates new form Menu
      */
     public Menu() {
+        enumDepartamentos = new DefaultComboBoxModel(EnumDepartamentos.values());
+        enumZonas = new DefaultComboBoxModel(EnumZona.values());
+        enumTipoCalles = new DefaultComboBoxModel(EnumTipoCalle.values());
         initComponents();
+        this.setLocationRelativeTo(this);
+        borrarDatosTabla();
+        listarEmpleados();
+        
     }
+    public void borrarDatosTabla() {
+        for (int i = 0; i < tblEmpleados.getRowCount(); i++) {
+            //Eliminamos todos los registros de empleados que tiene la tabla
+            contenidoTablaEmpleados.removeRow(i);
+            i = i-1;
+        }
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -31,7 +61,7 @@ public class Menu extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblEmpleados = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
@@ -67,28 +97,24 @@ public class Menu extends javax.swing.JFrame {
 
         jPanel5.setBackground(new java.awt.Color(51, 51, 51));
 
-        jTable1.setBackground(new java.awt.Color(204, 204, 204));
-        jTable1.setForeground(new java.awt.Color(255, 255, 255));
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblEmpleados.setBackground(new java.awt.Color(204, 204, 204));
+        tblEmpleados.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+
             },
             new String [] {
                 "ID", "NOMBRE", "TIPO DE DOCUMENTO", "DOCUMENTO", "CORREO"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, true, false
+                false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tblEmpleados);
 
         jButton1.setBackground(new java.awt.Color(51, 51, 51));
         jButton1.setForeground(new java.awt.Color(255, 255, 255));
@@ -224,15 +250,66 @@ public class Menu extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         AddUserForm addUserF = new AddUserForm(this, rootPaneCheckingEnabled);
         addUserF.setVisible(rootPaneCheckingEnabled);
-        
-
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void listarEmpleados(){
+        String queryConsulta = "SELECT * FROM empleado";
+        try{
+            cn = con.getConnection();
+            //Creamos el queryConsulta
+            st = cn.createStatement();
+            // Ejecutamos el query que contiene la variable queryConsulta
+            rs = st.executeQuery(queryConsulta);
+            // Creamos un objeto que almacena todos los registros de empleados
+            // que existen en la base de datos
+            Object[] empleados = new Object[5];
+            contenidoTablaEmpleados = (DefaultTableModel)tblEmpleados.getModel();
+            // Mientras el resultado del queryConsulta encuentre registros en la
+            // base de datos se ingresa al while
+            while(rs.next()){
+                empleados[0] = rs.getInt("idEmp");
+                empleados[1] = rs.getString("nombreEmp") + " " + rs.getString("apellidos");
+                empleados[2] = rs.getString("tipoDocumento");
+                empleados[3] = rs.getString("documento");
+                empleados[4] = rs.getString("correo");
+                contenidoTablaEmpleados.addRow(empleados);
+                System.out.println(rs.getInt("idEmp") + " " 
+                        + rs.getString("nombreEmp") + " " + rs.getString("apellidos"));
+            }
+            tblEmpleados.setModel(contenidoTablaEmpleados);
+        }catch(SQLException e){
+            System.out.println("Error "+e);
+        }
+    }
+            
+
+    /**public void listarDepartamentos() {
+        String query = "SELECT nombreSucursal, nombreDepartamento, CONCAT('Zona ', zona, '. ', tipoCalle, ' ', numero1,' #No. ', numero2, ' - ', numero3) AS direccion FROM direccion INNER JOIN sucursal ON direccion.idDireccion = sucursal.FK_idDireccion ORDER BY nombreDepartamento;";
+        try {
+            cn = con.getConnection();
+            st = cn.createStatement();
+            rs = st.executeQuery(query);
+            Object[] departamento = new Object[3];
+            contenidoTablaDepartamento = (DefaultTableModel) tblDepartamentos.getModel();
+            while (rs.next()) {
+                departamento[0] = rs.getString("nombreSucursal");
+                departamento[1] = rs.getString("nombreDepartamento");
+                departamento[2] = rs.getString("direccion");
+                System.out.println("sucursal: " + departamento[0] + "departamento: " + departamento[1] + ", dirección: " + departamento[2]);
+                contenidoTablaDepartamento.addRow(departamento);
+                tblDepartamentos.setModel(contenidoTablaDepartamento);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+    }
+**/
     /**
      * @param args the command line arguments
      */
@@ -281,6 +358,6 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tblEmpleados;
     // End of variables declaration//GEN-END:variables
 }

@@ -2,8 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
-package reto1.vistas;
+package Reto1.vistas;
 
+import Reto1.Modelo.Conexion;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import javax.swing.JOptionPane;
 
 /**
@@ -11,6 +16,10 @@ import javax.swing.JOptionPane;
  * @author jonat
  */
 public class AddUserForm extends javax.swing.JDialog {
+    Conexion con = new Conexion();
+    Connection cn;
+    Statement st;
+    ResultSet rs;
 
     /**
      * Creates new form AddUserForm
@@ -18,6 +27,8 @@ public class AddUserForm extends javax.swing.JDialog {
     public AddUserForm(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.setLocationRelativeTo(parent);
+        
     }
 
     /**
@@ -225,26 +236,33 @@ public class AddUserForm extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        //Capturamos los valores de los campos txtfield y de la lista desplegable
-        String nombre = txtName.getText();
-        String apellido = txtLastname.getText();
-        //Combobox = cbDocumentType[0] = "C.C.", cbDocumentType[1] = "C.E."
-        int indexTipoDocumento = cbDocumentType.getSelectedIndex();
-        String tipoDocumento = (String) cbDocumentType.getSelectedItem();
-        String documento = txtDocument.getText();
-        String correo = txtEmail.getText();
-
-        //Validar si algunos de los campos no fue diligenciando (Sólo los campos txtfield)
-        if (nombre.isEmpty() || apellido.isEmpty() || documento.isEmpty() || correo.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Hay campos requeridos sin diligenciar");
+        String name = txtName.getText();
+        String lastname = txtLastname.getText();
+        // Lista desplegable contiene 5 elementos
+        // cbDocumentType[0] = Cédula de ciudadanía
+        int documentType = cbDocumentType.getSelectedIndex();
+        String documentTypeN = (String) cbDocumentType.getSelectedItem();
+        String document = txtDocument.getText();
+        String email = txtEmail.getText();
+        System.out.println("name: " + name + " " + lastname
+                + ", document: " + documentTypeN + " " + document
+                + ", email: " + email);
+        if (name.isEmpty() || lastname.isEmpty() || document.isEmpty() || email.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Hay campos requeridos sin diligenciar", "Empleado", JOptionPane.WARNING_MESSAGE);
         } else {
-            //Validamos si estamos capturando los valores correctamente
-            JOptionPane.showMessageDialog(this, "Registro éxitoso");
-            //Cerrar ventana del JDialog
+            String queryNuevoEmpleado = 
+                    "INSERT INTO `empleados`(`nombreEmp`, `apellidos`, `tipoDocumento`, `documento`, `correo`) VALUES ('" 
+                    + name + "','" + lastname + "','" + documentTypeN + "','" 
+                    + document + "','" + email + "')";
+            try{
+                cn = con.getConnection();
+                st = cn.createStatement();
+                st.executeUpdate(queryNuevoEmpleado);
+                JOptionPane.showMessageDialog(this, "Registro éxitoso");
+            }catch(SQLException e){
+                JOptionPane.showMessageDialog(this, "No se pudo registrar el nuevo empleado.", "Empleados", JOptionPane.ERROR_MESSAGE);
+            }
             this.dispose();
-            System.out.println("Nombre: " + nombre + " " + apellido + ", documento: "
-                    + indexTipoDocumento + " " + tipoDocumento + " " + documento
-                    + ", correo: " + correo);
         }
 
     }//GEN-LAST:event_jButton1ActionPerformed
